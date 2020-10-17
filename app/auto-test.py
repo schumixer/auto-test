@@ -13,7 +13,7 @@ def main():
       with open(f"{studentData['dir']}/{file}", encoding="utf8") as studentFile:
          studentLines = studentFile.readlines()
          configure = studentLines[0] = studentLines[0].strip()
-         fullName = studentLines[1] = studentLines[1].strip()
+         fullName = studentLines[1] = studentLines[1].strip().upper()
 
          if fullName in names:
             isExist = False

@@ -40,7 +40,7 @@ class Data:
         file = Data.chooseFile(titleName)
         tempList =  pd.read_excel(file, index_col=None, header=None).values.tolist()
         for i in range(len(tempList)):
-            tempList[i]=tempList[i][0]
+            tempList[i]=tempList[i][0].upper()
         return tempList
     
     @staticmethod
