@@ -1,0 +1,5 @@
+config_2
+Иванов Юрий Иванович
+apple
+banana
+orange

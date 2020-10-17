@@ -1,0 +1,5 @@
+config_2
+Петров Александр Олегович
+apple
+banana
+orange
