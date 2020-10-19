@@ -24,6 +24,7 @@ class Data:
              }
     version = ""
     columns = ["ФИО","Номер лабы"]
+    outputFileName = "output.xlsx"
      
     @staticmethod
     def chooseDirectory(titleName):
@@ -61,6 +62,11 @@ class Data:
         return {"dir":dir, "files":files}
 
     @staticmethod
+    def input():
+        return (Data.readData('model'), Data.readData('student'),
+                Data.readNames("names"), Data.chooseDirectory("result"))
+    
+    @staticmethod
     def TruncateExtensions(lines):
         for i in range(len(lines)):
             (prefix, sep, suffix) = lines[i].rpartition('.')
@@ -82,4 +88,77 @@ class Data:
             data.append(row)
 
         df = pd.DataFrame(data,columns=Data.columns, index = np.arange(1,len(students)+1))
-        df.to_excel(resultData+"/output.xlsx") 
+        df.to_excel(resultData+f"/{Data.outputFileName}")
+
+
+
+
+
+
+class Main():
+   @staticmethod
+   def mainFunction(modelData, studentData, names, resultData):
+      #initialising all the students from the excel file
+      students = []
+      for name in names:
+         students.append(Student(name))
+
+      #check out all the students
+
+      for file in studentData["files"]:
+         #opening the file with students works
+         with open(f"{studentData['dir']}/{file}", encoding="utf8") as studentFile:
+            studentLines = studentFile.readlines()
+            configure = studentLines[0] = studentLines[0].strip()
+            fullName = studentLines[1] = studentLines[1].strip().upper()
+
+            #if name of the student was in excel file
+            if fullName in names:
+               #isExist = False
+               studentsNumber = len(students)
+               for i in range(len(students)):
+                  if fullName == students[i].fullName:
+                     studentsNumber = i
+                     #isExist = True
+                     break
+               # if not isExist:
+               #    students.append(Student(fullName))
+               
+               if configure in Data.TruncateExtensions(copy.copy((modelData["files"]))):
+                  #opening the file with model works
+                  with open(f"{modelData['dir']}/{configure+'.txt'}", encoding="utf8") as modelFile:
+                     modelLines = modelFile.readlines()
+
+                     isRight = True
+
+
+                     if(len(studentLines)==len(modelLines)+2):
+
+                        for i in range(len(modelLines)):
+
+                           if studentLines[i+2].strip()!=modelLines[i].strip():
+                              students[studentsNumber].currentResults[configure]="-"
+                              isRight = False
+                              break
+
+                        if isRight:
+                           students[studentsNumber].currentResults[configure]="+"
+
+                     else: 
+                        students[studentsNumber].currentResults[configure]="-"
+
+               else:
+                  students[studentsNumber].currentResults[configure]="-"
+
+      #addition undone configures
+      for i in range(len(students)):
+         for item in Data.TruncateExtensions(copy.copy((modelData["files"]))):
+            if item not in students[i].currentResults.keys():
+               students[i].currentResults[item]="-"
+
+      #calculating finished results
+      for i in range(len(students)):
+         students[i].calculateFinishResult(len((modelData["files"])))
+      
+      return students
+
