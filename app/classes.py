@@ -55,7 +55,7 @@ class Data:
                     files.append(fileName)
 
         if titleName == 'model':
-            with open(dir+"/"+"version.txt", encoding="utf8") as f:
+            with open(dir+"/"+"version.txt", encoding='latin-1') as f:
                 Data.version = f.read().strip()
                 files.remove("version.txt")
 
@@ -107,7 +107,7 @@ class Main():
 
       for file in studentData["files"]:
          #opening the file with students works
-         with open(f"{studentData['dir']}/{file}", encoding="utf8") as studentFile:
+         with open(f"{studentData['dir']}/{file}") as studentFile:
             studentLines = studentFile.readlines()
             configure = studentLines[0] = studentLines[0].strip()
             fullName = studentLines[1] = studentLines[1].strip().upper()
@@ -126,7 +126,7 @@ class Main():
                
                if configure in Data.TruncateExtensions(copy.copy((modelData["files"]))):
                   #opening the file with model works
-                  with open(f"{modelData['dir']}/{configure+'.txt'}", encoding="utf8") as modelFile:
+                  with open(f"{modelData['dir']}/{configure+'.txt'}") as modelFile:
                      modelLines = modelFile.readlines()
 
                      isRight = True

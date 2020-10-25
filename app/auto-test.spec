@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['auto-test.py'],
-             pathex=['C:\\Users\\Михаил\\Desktop\\auto-test\\app'],
+             pathex=['C:\\data\\it\\python\\auto-test\\app'],
              binaries=[],
              datas=[],
              hiddenimports=[],
