@@ -31,6 +31,8 @@ class Data:
         Tk().withdraw()
         return askdirectory(title=Data.titles[titleName])
 
+
+
     @staticmethod
     def chooseFile(titleName):
         Tk().withdraw()
@@ -41,7 +43,7 @@ class Data:
         file = Data.chooseFile(titleName)
         tempList =  pd.read_excel(file, index_col=None, header=None).values.tolist()
         for i in range(len(tempList)):
-            tempList[i]=tempList[i][0].upper()
+            tempList[i]=Main.replaceSym(tempList[i][0].upper())
         return tempList
     
     @staticmethod
@@ -51,11 +53,12 @@ class Data:
         files = []
         for root, dirs, tempFiles in os.walk(dir):  
             for fileName in tempFiles:
-                if fileName.endswith('.txt'):
+                lowerCaseFileName = fileName.lower()
+                if lowerCaseFileName.endswith('.txt'):
                     files.append(fileName)
 
         if titleName == 'model':
-            with open(dir+"/"+"version.txt", encoding='latin-1') as f:
+            with open(dir+"/"+"version.txt",encoding='cp437') as f:
                 Data.version = f.read().strip()
                 files.remove("version.txt")
 
@@ -97,21 +100,49 @@ class Data:
 
 class Main():
    @staticmethod
+   def chooseEncoding(file):
+      with open(file,"rb") as f:
+          text=f.read()
+          enc = chardet.detect(text).get("encoding")
+          if enc.lower() == "maccyrillic":
+              enc = "windows-1251"
+          return enc
+    
+   @staticmethod
+   def deleteEmptyLines(studentLines):
+       newStudentLines = []
+       for item in studentLines:
+           if item.strip()!='':
+               newStudentLines.append(item.strip())
+       return newStudentLines
+
+   @staticmethod
+   def replaceSym(string):
+       return string.replace("Ё","Е") 
+        
+   @staticmethod
+   def checkRightName(name):
+       return name!="#"
+
+
+   @staticmethod
    def mainFunction(modelData, studentData, names, resultData):
       #initialising all the students from the excel file
       students = []
       for name in names:
          students.append(Student(name))
-
+      
+      #checkRightName = True
       #check out all the students
-
       for file in studentData["files"]:
          #opening the file with students works
-         with open(f"{studentData['dir']}/{file}") as studentFile:
-            studentLines = studentFile.readlines()
-            configure = studentLines[0] = studentLines[0].strip()
-            fullName = studentLines[1] = studentLines[1].strip().upper()
-
+         encodingResult=Main.chooseEncoding(f"{studentData['dir']}/{file}")
+         
+         with open(f"{studentData['dir']}/{file}",encoding=encodingResult) as studentFile:
+            studentLines = Main.deleteEmptyLines(studentFile.readlines())
+            configure = studentLines[0]
+            fullName = studentLines[1] = Main.replaceSym(studentLines[1].upper())
+            #checkRightName = Main.checkRightName(configure)
             #if name of the student was in excel file
             if fullName in names:
                #isExist = False
@@ -126,7 +157,7 @@ class Main():
                
                if configure in Data.TruncateExtensions(copy.copy((modelData["files"]))):
                   #opening the file with model works
-                  with open(f"{modelData['dir']}/{configure+'.txt'}") as modelFile:
+                  with open(f"{modelData['dir']}/{configure+'.txt'}",encoding="cp437") as modelFile:
                      modelLines = modelFile.readlines()
 
                      isRight = True
@@ -158,7 +189,7 @@ class Main():
 
       #calculating finished results
       for i in range(len(students)):
-         students[i].calculateFinishResult(len((modelData["files"])))
+         students[i].calculateFinishResult(len(modelData["files"]))
       
       return students
 
